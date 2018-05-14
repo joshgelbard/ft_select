@@ -1,29 +1,5 @@
-#define DEBUG
+#include "ft_select.h"
 
-#ifdef DEBUG
-# include "dev_util.h"
-# include <stdio.h>
-char _buf[40];
-struct termios g_oldterm;
-# define ft_putchar putchar
-# define _tputs(s) tputs(s, 1, ft_putchar) 
-# define _tputsn(s, n) tputs(s, n, ft_putchar)
-# define _cname(cmd) tgetstr(cmd, (char **)&_buf)
-# define _do(cmd) _tputs(_cname(cmd))
-# define _dogoto(cmd, h, v) _tputs(tgoto(_cname(cmd), h, v))
-# include <assert.h>
-#endif
-
-#include <stdlib.h>
-#include <termcap.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
-#include <signal.h>
-
-void deinit(void);
-void handle_signal(int);
-void loop(void);
 void basictest()
 {
 	_do("cl");
@@ -32,32 +8,12 @@ void basictest()
 	_do("ho");
 }
 
-void terminit()
-{
-	static struct termios *new;
-
-	if (!new)
-	{
-		new = malloc(sizeof *new);
-		tcgetattr(STDOUT_FILENO, new);
-		tcgetattr(STDOUT_FILENO, &g_oldterm);
-		new->c_lflag &= ~(ICANON | ECHO);
-	}
-	PC = _cname("pc") ? *(_cname("pc")) : 0;
-	BC = _cname("le");
-	UP = _cname("up");
-	ospeed = new->c_ospeed;
-	_do("ti"); /* enter fullscreen mode */
-	_do("ks"); /* allow arrow keys */
-	tcsetattr(STDOUT_FILENO, TCSAFLUSH, new);
-}
-
 void handle_signal(int sig)
 {
-
 	static int is_terminating;
-	psignal(sig);
+	psignal(sig, "");
 	sleep(1);
+
 	if (sig == SIGTERM || sig == SIGINT || sig == SIGQUIT || sig == SIGHUP)
 	{
 		if (is_terminating == 0)
@@ -70,12 +26,10 @@ void handle_signal(int sig)
 	}
 	else if (sig == SIGCHLD)
 	{
-		puts("A CHILD APPEARS");
 		;
 	}
 	else if (sig == SIGCONT)
 	{
-		puts("SIGCONT");
 		signal(SIGTSTP, handle_signal);
 		siglisten();
 		loop();
@@ -83,7 +37,6 @@ void handle_signal(int sig)
 	}
 	else if (sig == SIGTSTP)
 	{
-		puts("SIGTSTP");
 		signal(SIGCONT, handle_signal);
 		deinit();
 		signal(sig, SIG_DFL);
@@ -92,29 +45,12 @@ void handle_signal(int sig)
 	/* window resizing stuff will likely happen here */
 	else if (sig == SIGINFO)
 	{
-		puts("SIGINFO");
 		;
 	}
 	else
 	{
 		puts("THIS DOES NOT HAPPEN");
 		assert(0);
-	}
-}
-
-
-void siglisten()
-{
-	for (int i = 1; i < 32; ++i)
-	{
-		if (i == SIGTERM
-				|| i == SIGINT
-				|| i == SIGHUP
-				|| i == SIGCHLD
-				|| i == SIGCONT
-				|| i == SIGTSTP
-				|| i == SIGINFO)
-		signal(i, handle_signal);
 	}
 }
 
@@ -145,15 +81,6 @@ void test_get_input(void)
 	}
 }
 
-void deinit(void)
-{
-	_do("te"); /* exit fullscreen mode */
-	_do("me"); /* exit alternate text appearance modes */
-	_do("ei"); /* exit insert mode */
-	ospeed = g_oldterm.c_ospeed;
-	tcsetattr(STDOUT_FILENO, TCSAFLUSH, &g_oldterm);
-}
-
 void loop(void)
 {
 	terminit();
@@ -167,6 +94,7 @@ void loop(void)
 int main(int argc, char **argv)
 {
 #define DEBUG // just a reminder
+
 	char termbuf[2048];
 
 	tgetent(termbuf, getenv("TERM"));
