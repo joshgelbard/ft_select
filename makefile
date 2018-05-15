@@ -1,4 +1,4 @@
 all: main
 
-%: %.c dev_util.c termsetup.c
+%: %.c dev_util.c setup.c signal.c
 	gcc -Wall -Wno-unused-function -Wno-unused-variable -ltermcap $^
