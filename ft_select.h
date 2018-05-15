@@ -6,23 +6,21 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/14 13:54:18 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/14 14:14:23 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 01:55:26 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_SELECT_H
 # define FT_SELECT_H
+# include "libft.h"
 # define DEBUG
 
 # ifdef DEBUG
-#  include "dev_util.h"
 #  include <stdio.h>
-char _buf[40];
 struct termios g_oldterm;
-#  define ft_putchar putchar
-#  define _tputs(s) tputs(s, 1, ft_putchar) 
-#  define _tputsn(s, n) tputs(s, n, ft_putchar)
-#  define _cname(cmd) tgetstr(cmd, (char **)&_buf)
+#  define _tputs(s) tputs(s, 1, writechar) 
+#  define _tputsn(s, n) tputs(s, n, writechar)
+#  define _cname(cmd) tgetstr(cmd, NULL)
 #  define _do(cmd) _tputs(_cname(cmd))
 #  define _dogoto(cmd, h, v) _tputs(tgoto(_cname(cmd), h, v))
 #  include <assert.h>
@@ -35,12 +33,64 @@ struct termios g_oldterm;
 # include <unistd.h>
 # include <signal.h>
 
-void terminit(void);
-void deinit(void);
-void siglisten(void);
-void handle_signal(int sig);
-void loop(void);
-void basictest(void);
-void test_get_input(void);
+#define FLAG_SELECTED 1
+#define FLAG_HOVERED 2
+#define FLAG_DELETED 4
+
+#define IS_SELECTED(g) ((g->status) & FLAG_SELECTED)
+#define IS_HOVERED(g) ((g->status) & FLAG_HOVERED)
+#define IS_DELETED(g) ((g->status) & FLAG_DELETED)
+
+#define SELECT(g) g->status |= FLAG_SELECTED
+#define HOVER(g) g->status |= FLAG_HOVERED
+#define DELETE(g) g->status |= FLAG_DELETED
+
+#define DESELECT(g) g->status &= (~(FLAG_SELECTED))
+#define UNHOVER(g) g->status &= (~(FLAG_HOVERED))
+#define TOGGLE_SELECT(g) g->status ^= FLAG_SELECTED
+
+typedef struct		s_arg
+{
+	int				idx;
+	int				row;
+	int				col;
+	int				len;
+	char			*s;
+	int				status;
+}					t_arg;
+
+typedef struct		s_args
+{
+	int				argc;
+	t_arg			**args;
+}					t_args;
+
+typedef struct		s_state
+{
+	t_arg			**all_args;
+	t_arg			**args;
+	int				*col_widths;
+	int				ncols;
+	int				argc;
+	int				remaining;
+	t_arg			*hovered;
+}					t_state;
+
+void	terminit(void);
+int		writechar(int);
+void	deinit(void);
+void	siglisten(void);
+void	print_arg(t_arg *g, int v);
+void	handle_signal(int sig);
+void	loop(t_state *state);
+void	basictest(void);
+void	test_get_input(void);
+void	print_at_location(char *s, int h, int v);
+void	print_state(t_state *state);
+struct s_args *init_args(int argc, char **argv);
+t_state		*init_state(int argc, char **argv);
+void		move_cursor(t_state *state, int h, int v);
+void		update_columns_view(t_state *state); //...window info
+t_arg		*arg_at(t_state *state, int r, int c);
 
 #endif

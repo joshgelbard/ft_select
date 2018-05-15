@@ -1,4 +1,5 @@
 all: main
 
-%: %.c dev_util.c setup.c signal.c
-	gcc -Wall -Wno-unused-function -Wno-unused-variable -ltermcap $^
+%: %.c setup.c signal.c state.c print.c
+	make -C libft
+	gcc -Wall -Wno-unused-function -Wno-unused-variable -lft -L./libft -ltermcap $^

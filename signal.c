@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/14 20:07:32 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/14 20:08:48 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 02:03:47 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ void handle_signal(int sig)
 #ifdef DEBUG
 	psignal(sig, "");
 #endif
-
 	if (sig == SIGTERM || sig == SIGINT || sig == SIGQUIT || sig == SIGHUP)
 	{
 		deinit();
@@ -27,7 +26,7 @@ void handle_signal(int sig)
 	{
 		siglisten();
 		terminit();
-		loop();
+		loop(NULL);
 	}
 	else if (sig == SIGTSTP)
 	{

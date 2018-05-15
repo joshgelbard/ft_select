@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   termsetup.c                                        :+:      :+:    :+:   */
+/*   term_setup.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/14 14:18:38 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/14 20:14:06 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 02:03:07 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void terminit()
 	ospeed = new->c_ospeed;
 	_do("ti"); /* enter fullscreen mode */
 	_do("ks"); /* interpret arrow keys */
+	_do("vi"); /* make cursor disappear */
 	tcsetattr(STDOUT_FILENO, TCSADRAIN, new);
 }
 
@@ -38,6 +39,7 @@ void deinit(void)
 {
 	_do("te"); /* exit fullscreen mode */
 	_do("ke"); /* stop interpreting arrow keys */
+	_do("ve"); /* bring back cursor */
 	ospeed = g_oldterm.c_ospeed;
 	tcsetattr(STDOUT_FILENO, TCSADRAIN, &g_oldterm);
 }
