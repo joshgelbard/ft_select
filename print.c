@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/15 19:19:58 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 01:17:47 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 03:15:40 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,10 @@ void		print_col(t_state *state, int col, int v)
 }
 void		print_arg(t_arg *g, int v)
 {
-	if (g->status & FLAG_SELECTED)
+	assert(!IS_DELETED(g));
+	if (IS_SELECTED(g))
 		_do("mr");
-	if (g->status & FLAG_HOVERED)
+	if (IS_HOVERED(g))
 		_do("us");
 	print_at_location(g->s, v + g->col, g->row);
 	_do("me");

@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/16 02:02:25 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 02:02:27 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 03:13:54 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,43 @@ int		handle_done_key(t_state *state, char *buf)
 	return (0);
 }
 
+int		handle_delete_key(t_state *state, char *buf)
+{
+	static char		*del;
+	t_arg			*g;
+	t_arg			*replace;
+
+	if (!del)
+		del = _cname("kD");
+	if (!ft_memcmp(buf, del, 3) || !ft_memcmp(buf, "\b", 2))
+	{
+		if (state->remaining == 1)
+		{
+			deinit();
+			exit(0);
+		}
+		g = state->hovered;
+		;
+		if (!(replace = find_nondeleted(state, g->idx, 1)))
+			replace = find_nondeleted(state, g->idx, -1);
+		state->hovered = replace;
+		HOVER(replace);
+		DELETE(g);
+		state->remaining -= 1;
+		g->row = -1;
+		g->col = -1;
+		return (1);
+	}
+	return (0);
+}
+
 int		handle_select_key(t_state *state, char *buf)
 {
+	if (!ft_memcmp(buf, " ", 2))
+	{
+		TOGGLE_SELECT(state->hovered);
+		return (1);
+	}
 	return (0);
 }
 
@@ -84,9 +119,10 @@ void loop(t_state *init_state)
 		print_state(state);
 		read(STDIN_FILENO, buf, sizeof(buf));
 		handle_movement_key(state, (char *)buf) ||
-		handle_quit_key(state, (char *)buf) ||
+		handle_select_key(state, (char *)buf) ||
+		handle_delete_key(state, (char *)buf) ||
 		handle_done_key(state, (char *)buf) ||
-		handle_select_key(state, (char *)buf);
+		handle_quit_key(state, (char *)buf);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/14 13:54:18 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 01:55:26 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 03:03:04 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ struct s_args *init_args(int argc, char **argv);
 t_state		*init_state(int argc, char **argv);
 void		move_cursor(t_state *state, int h, int v);
 void		update_columns_view(t_state *state); //...window info
+t_arg		*find_nondeleted(t_state *state, int idx, int dir);
 t_arg		*arg_at(t_state *state, int r, int c);
 
 #endif

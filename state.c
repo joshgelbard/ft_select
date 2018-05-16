@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/15 16:19:58 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 02:09:12 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 03:15:32 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static int		num_reqd_cols()
 {
-	return (10);
+	return (2);
 }
 
 static t_arg	**argify(int argc, char **argv)
@@ -40,6 +40,23 @@ static t_arg	**argify(int argc, char **argv)
 	return (args);
 }
 
+t_arg		*find_nondeleted(t_state *state, int i, int dir)
+{
+	t_arg	**all;
+	t_arg	*g;
+
+	all = state->all_args;
+	i += dir;
+	while (i >= 0 && i < state->argc)
+	{
+		g = all[i];
+		if (!IS_DELETED(g))
+			return (g);
+		i += dir;
+	}
+	return (NULL);
+}
+
 t_arg		*arg_at(t_state *state, int r, int c)
 {
 	t_arg **all;
@@ -48,7 +65,7 @@ t_arg		*arg_at(t_state *state, int r, int c)
 	all = state->all_args;
 	while ((g = *all))
 	{
-		if (!(IS_DELETED(g)) && g->row == r && g->col == c)
+		if (g->row == r && g->col == c)
 			break;
 		++all;
 	}
@@ -72,7 +89,7 @@ void		update_columns_view(t_state *state) // ..window info
 	i = 0;
 	while ((g = *all))
 	{
-		if (!(IS_DELETED(g)))
+		if (!IS_DELETED(g))
 		{
 			col_idx = i % state->ncols;
 			if (g->len > state->col_widths[col_idx])
