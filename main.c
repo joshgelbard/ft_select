@@ -6,15 +6,18 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/16 02:02:25 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 03:13:54 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 19:55:56 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_select.h"
 
+#include <fcntl.h> //XXX
+#include <unistd.h> //XXX
+
 int		writechar(int c)
 {
-	return (write(1, &c, 1));
+	return (write_state_fd(c, NULL));
 }
 
 int		handle_movement_key(t_state *state, char *buf)
@@ -32,7 +35,9 @@ int		handle_movement_key(t_state *state, char *buf)
 	}
 	match = 0;
 	if ((match = !ft_memcmp(dirs[0], buf, 3)))
+	{
 		move_cursor(state, 0, -1);
+	}
 	else if ((match = !ft_memcmp(dirs[1], buf, 3)))
 		move_cursor(state, 1, 0);
 	else if ((match = !ft_memcmp(dirs[2], buf, 3)))
@@ -47,7 +52,6 @@ int		handle_quit_key(t_state *state, char *buf)
 	if (!ft_memcmp(buf, "\E", 2))
 	{
 		puts("ESC");
-		sleep(1);
 		return (1);
 	}
 	return (0);
@@ -55,11 +59,23 @@ int		handle_quit_key(t_state *state, char *buf)
 
 int		handle_done_key(t_state *state, char *buf)
 {
+	t_arg	**all;
+	t_arg	*g;
+
+	all = state->all_args;
 	if (!ft_memcmp(buf, "\n", 2))
 	{
-		puts("RETURN");
-		sleep(1);
-		return (1);
+		while ((g = (*all++)))
+		{
+			if (IS_SELECTED(g))
+			{
+				ft_putstr(g->s);
+				ft_putchar(' ');
+			}
+		}
+		ft_putchar('\n');
+		deinit(NULL);
+		exit(0);
 	}
 	return (0);
 }
@@ -76,11 +92,10 @@ int		handle_delete_key(t_state *state, char *buf)
 	{
 		if (state->remaining == 1)
 		{
-			deinit();
+			deinit(NULL);
 			exit(0);
 		}
 		g = state->hovered;
-		;
 		if (!(replace = find_nondeleted(state, g->idx, 1)))
 			replace = find_nondeleted(state, g->idx, -1);
 		state->hovered = replace;
@@ -129,17 +144,23 @@ void loop(t_state *init_state)
 int main(int argc, char **argv)
 {
 #define DEBUG // just a reminder
-	char termbuf[2048];
-	t_state *state;
+	char		termbuf[2048];
+	t_state		*state;
+	int			fd;
 
+	/* FIXME: Currently seeding many fns with static fd. Replace this mess. */
 	if (argc < 2)
 		return (0);
-	tgetent(termbuf, getenv("TERM"));
+	fd = isatty(STDOUT_FILENO) ? STDOUT_FILENO : open("/dev/tty", O_RDWR);
+	state = init_state(argc - 1, argv + 1, fd);
+	print_at_location(NULL, fd, 0);
+	write_state_fd(0, state);
+	tgetent(termbuf, getenv(ttyname(fd)));
 	siglisten();
-	terminit();
-	state = init_state(argc - 1, argv + 1);
+	_do("cl");
+	terminit(&fd);
 	update_columns_view(state);
 	print_state(state);
 	loop(state);
-	deinit();
+	deinit(&fd);
 }

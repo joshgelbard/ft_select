@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/14 13:54:18 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 03:03:04 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 19:42:27 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ struct termios g_oldterm;
 # include <termios.h>
 # include <unistd.h>
 # include <signal.h>
+# include <sys/ioctl.h>
+# include <sys/ttycom.h>
 
 #define FLAG_SELECTED 1
 #define FLAG_HOVERED 2
@@ -43,9 +45,8 @@ struct termios g_oldterm;
 
 #define SELECT(g) g->status |= FLAG_SELECTED
 #define HOVER(g) g->status |= FLAG_HOVERED
-#define DELETE(g) g->status |= FLAG_DELETED
+#define DELETE(g) g->status = FLAG_DELETED
 
-#define DESELECT(g) g->status &= (~(FLAG_SELECTED))
 #define UNHOVER(g) g->status &= (~(FLAG_HOVERED))
 #define TOGGLE_SELECT(g) g->status ^= FLAG_SELECTED
 
@@ -73,12 +74,14 @@ typedef struct		s_state
 	int				ncols;
 	int				argc;
 	int				remaining;
+	int				fd;
 	t_arg			*hovered;
 }					t_state;
 
-void	terminit(void);
+void	terminit(int *init_fd);
 int		writechar(int);
-void	deinit(void);
+int		write_state_fd(int c, t_state *init_state);
+void	deinit(int *init_fd);
 void	siglisten(void);
 void	print_arg(t_arg *g, int v);
 void	handle_signal(int sig);
@@ -88,7 +91,7 @@ void	test_get_input(void);
 void	print_at_location(char *s, int h, int v);
 void	print_state(t_state *state);
 struct s_args *init_args(int argc, char **argv);
-t_state		*init_state(int argc, char **argv);
+t_state		*init_state(int argc, char **argv, int fd);
 void		move_cursor(t_state *state, int h, int v);
 void		update_columns_view(t_state *state); //...window info
 t_arg		*find_nondeleted(t_state *state, int idx, int dir);

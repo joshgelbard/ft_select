@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/15 19:19:58 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 03:15:40 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 19:48:38 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,16 @@
 
 void		print_at_location(char *s, int h, int v)
 {
-	int l = strlen(s);
-	_dogoto("cm", h, v);
-	ft_putstr(s);
+	static int fd;
+
+	if (s == NULL)
+		fd = h;
+	else
+	{
+		int l = strlen(s);
+		_dogoto("cm", h, v);
+		ft_putstr_fd(s, fd);
+	}
 }
 
 void		print_col(t_state *state, int col, int v)
@@ -35,6 +42,19 @@ void		print_col(t_state *state, int col, int v)
 		++all;
 	}
 }
+
+int			write_state_fd(int c, t_state *init_state)
+{
+	static t_state	*state;
+
+	if (init_state)
+	{
+		state = init_state;
+		return (1);
+	}
+	return (write(state->fd, &c, 1));
+}
+
 void		print_arg(t_arg *g, int v)
 {
 	assert(!IS_DELETED(g));

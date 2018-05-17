@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/14 20:07:32 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 02:03:47 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 18:29:51 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,18 @@ void handle_signal(int sig)
 #endif
 	if (sig == SIGTERM || sig == SIGINT || sig == SIGQUIT || sig == SIGHUP)
 	{
-		deinit();
+		deinit(NULL);
 		exit(1);
 	}
 	else if (sig == SIGCONT)
 	{
 		siglisten();
-		terminit();
+		terminit(NULL);
 		loop(NULL);
 	}
 	else if (sig == SIGTSTP)
 	{
-		deinit();
+		deinit(NULL);
 		signal(sig, SIG_DFL);
 		raise(sig);
 	}

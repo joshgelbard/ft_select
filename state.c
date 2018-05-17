@@ -6,7 +6,7 @@
 /*   By: jgelbard <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/15 16:19:58 by jgelbard          #+#    #+#             */
-/*   Updated: 2018/05/16 03:15:32 by jgelbard         ###   ########.fr       */
+/*   Updated: 2018/05/16 19:42:09 by jgelbard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void		update_columns_view(t_state *state) // ..window info
 	}
 }
 
-t_state			*init_state(int argc, char **argv)
+t_state			*init_state(int argc, char **argv, int fd)
 {
 	t_state		*state;
 
@@ -113,6 +113,7 @@ t_state			*init_state(int argc, char **argv)
 	state->hovered = state->all_args[0];
 	HOVER(state->all_args[0]);
 	state->ncols = 1;
+	state->fd = fd;
 	state->col_widths = ft_memalloc(sizeof(state->col_widths[0]) * argc);
 	return (state);
 }
