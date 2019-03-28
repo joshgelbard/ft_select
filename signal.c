@@ -35,7 +35,7 @@ void handle_signal(int sig)
 		raise(sig);
 	}
 	/* window resizing stuff will likely happen here */
-	else if (sig == SIGINFO)
+	else if (sig == SIGWINCH)
 	{
 		raise(sig);
 	}
@@ -52,7 +52,7 @@ void siglisten()
 	signal(SIGINT, handle_signal);
 	signal(SIGCONT, handle_signal);
 	signal(SIGTSTP, handle_signal);
-	signal(SIGINFO, handle_signal);
+	signal(SIGWINCH, handle_signal);
 	signal(SIGHUP, handle_signal);
 	signal(SIGQUIT, handle_signal);
 }

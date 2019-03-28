@@ -1,5 +1,8 @@
-all: main
+NAME=ft_select
 
-%: %.c setup.c signal.c state.c print.c
+all: $(NAME)
+
+$(NAME): main.c setup.c signal.c state.c print.c
+	git submodule update --init
 	make -C libft
-	gcc -Wall -Wno-unused-function -Wno-unused-variable -lft -L./libft -ltermcap $^
+	gcc -Wall -Wextra -Llibft -Ilibft -o $@ $^ -lft -ltermcap

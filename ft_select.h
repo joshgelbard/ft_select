@@ -33,7 +33,9 @@ struct termios g_oldterm;
 # include <unistd.h>
 # include <signal.h>
 # include <sys/ioctl.h>
-# include <sys/ttycom.h>
+# if __APPLE__
+#  include <sys/ttycom.h>
+# endif
 
 #define FLAG_SELECTED 1
 #define FLAG_HOVERED 2

@@ -65,7 +65,7 @@ int		handle_done_key(t_state *state, char *buf)
 	all = state->all_args;
 	if (!ft_memcmp(buf, "\n", 2))
 	{
-		while ((g = (*all++)))
+		while ((g = *all++))
 		{
 			if (IS_SELECTED(g))
 			{
@@ -133,11 +133,14 @@ void loop(t_state *init_state)
 		update_columns_view(state);
 		print_state(state);
 		read(STDIN_FILENO, buf, sizeof(buf));
-		handle_movement_key(state, (char *)buf) ||
-		handle_select_key(state, (char *)buf) ||
-		handle_delete_key(state, (char *)buf) ||
-		handle_done_key(state, (char *)buf) ||
-		handle_quit_key(state, (char *)buf);
+		// XXX: gross old code
+		if (!handle_movement_key(state, (char *)buf)
+				&& !handle_select_key(state, (char *)buf)
+				&& !handle_delete_key(state, (char *)buf)
+				&& !handle_quit_key(state, (char *)buf))
+		{
+			handle_done_key(state, (char *)buf);
+		}
 	}
 }
 
